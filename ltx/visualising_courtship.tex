@@ -17,24 +17,25 @@ We present approach to the automated analysis and visualisation of courtship ind
 
 Courtship index (CI) in \emph{Drosophila} is defined as the percentage of time spent by the male exhibiting any kind of courtship behaviour in a given period \cite{}. It is typically collected manually, by watching videos of courting flies and starting and stopping a stopwatch when courtship behaviour is observed. CI is a useful summary statistic, used to quantify a phenotypic change, and to correlate against a change in neurological structure \cite{}.
 
-A trained individual is capable of recording courtship in four flies at a time, or in one fly at up to 4$\times$ real-time video playback. This method of recording courtship index involves two gross forms of information attenuation. 
-The first is the attenuation of phenotypic information - compressing a large number of different behaviours into a single ``courtship'' behaviour (such as singing, chasing, dancing etc). 
-The second is the attenuation of temporal information - compressing the time course of courtship behaviour into a single percentage value. 
-This paper aims to address the second of these issues, using automatic machine vision and machine learning techniques to overcome the inherent limitations of manual analysis that necessitates temporal attenuation.
+A trained individual is capable of recording courtship in four flies at a time, or in one fly at up to 4$\times$ real-time video playback. This method of recording courtship index involves two gross forms of information attenuation. The first is the attenuation of phenotypic information - compressing a large number of different behaviours into a single ``courtship'' behaviour (such as singing, chasing, dancing etc). The second is the attenuation of temporal information - compressing the time course of courtship behaviour into a single percentage value. This paper aims to address the second of these issues, using automatic machine vision and machine learning techniques to overcome the inherent limitations of manual analysis that necessitates temporal attenuation.
 
-The use of automated methods of analysis to overcome this attenuation has a set of additional benefits. 
-The most striking of these benefits in practice is the reduction of labour - the methods reported below work faster than real time, removing the need to perform routine viewing of the collected videos and allowing the biologist to focus on analysing novel phenotypes that arise. 
-Another benefit is consistency - the methods reported below will analyse the same video in the same way every time. This allows the comparisons of results across studies without dealing with (or guiltily ignoring) the problem that different individuals can analyse the same video quite differently. 
-The final benefit is the ability to publish - the methods reported below will allow the publication of the classifier used to generate the results along with the collected video and feature data. 
+The use of automated analysis to overcome this attenuation has a set of additional benefits. The most striking of these in practice is the reduction of labour - the methods reported below work faster than real time, removing the need to perform routine viewing of the videos and allowing the biologist to focus on novel phenotypes that arise. Another benefit is consistency - these methods always return the same results when presented with the same data. This allows comparisons across studies without dealing with (or guiltily ignoring) the problem that different individuals can analyse the same video quite differently. The final benefit of these methods is the ability to publish the classifier used to generate the results along with the collected video and feature data.
 
-Our approach has two main components: tracking and classification. 
-The tracking component combines a background model with a sequence of image manipulations in order to extract ellipses around both male and female flies. 
-The classification component uses a labelled set of videos along with their associated features to train a decision tree, which can be used to classify any subsequent videos. 
-The remainder of the paper describes these two components, as well as a visualisation of the output of the decision tree in order to provide a rich summary of the courtship behaviour. A final classifier is used to separate markedly different courtship phenotypes based on the information extracted from the videos.
+Our approach has two main components: tracking and classification. The tracking component combines a background model, a sequence of image manipulations and a basic model of fly movement in order to extract position and orientation features from the video. The classification component uses a labelled set of videos along with their extracted features to train a decision tree, which can be used to classify any subsequent videos. The remainder of the paper describes these two components, as well as a visualisation of the output of the decision tree in order to provide a rich summary of the courtship behaviour. A final classifier is used to separate markedly different courtship phenotypes based on the information extracted from the videos.
 
 \section{Tracking}
 
-The video data consists of (at least one set of) a pair of courting flies. In order to decide whether or not courtship is taking place, we need to extract the position and orientation of each fly in the video.
+The video data consists of (at least one set of) a pair of courting flies. In order to decide whether or not courtship is taking place, we need to extract the position and orientation of each fly in the video. 
+
+The video itself is envisaged to come from a standard experimental setup: a single camera, viewing the courtship chamber(s) from above, with illumination coming from a set of non-specialist lights. The camera will likely be a hand-held camcorder or an IP camera (webcam) operating at around 30 frames per second. 
+
+This presents the first problem for the tracking approach - such videos are considered to be of a low quality. The fly takes up as little as a 10$\times$5 rectangle of pixels; the frame rate is low compared to some of the faster movements performed by the fly; lighting, reflections and shadows clutter the scene; video compression artefacts distort the sequence of images. 
+
+The second problem for the tracking approach is the movement of the flies. A smoothly moving object in a scene is relatively straight forward to track as its movements are quite predictable. A courting Drosophila, on the other hand, exhibits highly non-smooth, unpredictable movement. At best we can say that the flies mostly move forward. 
+
+The developed tracking algorithm attempts to deal with these issues in a straightforward and robust manner. We first fit ellipsoids to the flies before trying to determine their orientation. The orientation is determined using a smoothness constraint: it is unlikely that the fly will turn through a large angle in a single frame transition, and the observation that flies are much more likely to move in the direction they are facing.
+
+Our algorithm is summarised below, and illustrated in Figure \ref{fig:tracking}.
 
 \begin{enumerate}
 	\item create background model
@@ -51,6 +52,11 @@ The video data consists of (at least one set of) a pair of courting flies. In or
 		\item choose orientation based on movement
 	\end{enumerate}
 \end{enumerate}
+
+\begin{figure}
+	\label{fig:tracking}
+	\caption{Illustration of each step of the algorithm. Shown is (a) the background model, (b) the thresholded image, (c) the extracted contours, (d) the resulting ellipses.}
+\end{figure}
 
 \section{Classification}
 
