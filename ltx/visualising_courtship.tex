@@ -1,17 +1,19 @@
-\documentclass[acmtocl]{acmtrans2m}
+\documentclass[twocolumn]{article}
 
 \title{Visualising Courtship Index from Videos of Drosophila}
 
 \author{Michael Dewar, Tim Lukins and Douglas Armstrong}
-\begin{abstract}
-We present approach to the automated analysis and visualisation of courtship index (CI) in \emph{Drosophila} - usually defined as the percentage of time the male fruit fly spends displaying courtship behaviour over a fixed period. Using machine vision techniques we extract position and orientation features from video of courting flies. These features are then used in a classifier in order to determine the presence of courtship behaviour in each frame. Using this information we generate a set of visualisations which emphasises the time course of the behaviour. Hence, we arrive at a much richer interpretation of courtship index, one that highlights the dynamic aspects of \emph{Drosophila} courtship behaviour, exposing phenotypic information that the standard, manual assay would typically miss.
-\end{abstract}
 
-\category{H5.m}{Information interfaces and presentation}{Misc}
+
+%\category{H5.m}{Information interfaces and presentation}{Misc}
 
 \begin{document}
 	
 	\maketitle
+
+	\begin{abstract}
+	We present approach to the automated analysis and visualisation of courtship index (CI) in \emph{Drosophila} - usually defined as the percentage of time the male fruit fly spends displaying courtship behaviour over a fixed period. Using machine vision techniques we extract position and orientation features from video of courting flies. These features are then used in a classifier in order to determine the presence of courtship behaviour in each frame. Using this information we generate a set of visualisations which emphasises the time course of the behaviour. Hence, we arrive at a much richer interpretation of courtship index, one that highlights the dynamic aspects of \emph{Drosophila} courtship behaviour, exposing phenotypic information that the standard, manual assay would typically miss.
+	\end{abstract}
 
 \section{Introduction}
 
@@ -35,8 +37,9 @@ The second problem for the tracking approach is the movement of the flies. A smo
 
 The developed tracking algorithm attempts to deal with these issues in a straightforward and robust manner. We first fit ellipsoids to the flies before trying to determine their orientation. The orientation is determined using a smoothness constraint: it is unlikely that the fly will turn through a large angle in a single frame transition, and the observation that flies are much more likely to move in the direction they are facing.
 
-Our algorithm is summarised below, and illustrated in Figure \ref{fig:tracking}.
+Our algorithm is summarised in Table \ref{tab:tracking}, and illustrated in Figure \ref{fig:tracking}. 
 
+\begin{table}
 \begin{enumerate}
 	\item create background model
 	\item for each frame:
@@ -52,15 +55,25 @@ Our algorithm is summarised below, and illustrated in Figure \ref{fig:tracking}.
 		\item choose orientation based on movement
 	\end{enumerate}
 \end{enumerate}
+\label{tab:tracking}
+\caption{Each step of the tracking algorithm used for extracting the position and orientation from a low-quality video.}
+\end{table}
 
 \begin{figure}
-	\label{fig:tracking}
+	
 	\caption{Illustration of each step of the algorithm. Shown is (a) the background model, (b) the thresholded image, (c) the extracted contours, (d) the resulting ellipses.}
+	\label{fig:tracking}
 \end{figure}
 
 \section{Classification}
 
-Description of the courtship classification component
+In order to extract standard CI from a period video we need to be able to determine how long the fly spends courting in this period. When looking at all the various aspects of courtship behaviour we are able to highlight two features that are sufficient to characterise the vast majority of them: proximity and of male orientation with respect to the female (`pointing'). 
+
+For example, the courtship dance displayed by the male is typically performed within a certain distance, with the male maintaining his orientation toward the female at all times. Chasing, tapping and licking are all performed at very close proximity with male orientation toward the female. Due to the sensing abilities of the male fly, courtship rarely takes place at a large distance, and if the male is close to and facing the female for much longer than a second it is unlikely that anything but courtship is taking place.
+
+However, this relationship between proximity, pointing and courtship is not a straight-forward one, and can change depending on the experimental setup. In addition, the details associated with how close a male fly should be to the female in order to be considered courting, or how much he should be facing her, are not universally agreed on. 
+
+Hence a technique that can learn the non-linear relationship between proximity, pointing and courtship, that can be adapted to a user's idea of what is considered courtship, is required. To deliver this we present a decision tree technique that is able to learn this relationship and hence classify each frame of a video as courting or not courting. 
 
 \section{Visualisation}
 
@@ -75,7 +88,6 @@ Parmeterisation of the courtship index curves
 Performance of the algorithm
 
 \section{Conclusion}
-
 Conclusion
 
 \end{document}
