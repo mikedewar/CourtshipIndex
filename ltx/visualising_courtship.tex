@@ -1,4 +1,11 @@
-\documentclass[twocolumn]{article}
+\documentclass{article}
+\usepackage[pdftex]{graphicx}
+\usepackage{color}
+\usepackage[cmex10]{amsmath} %the AMS stuff, note option
+\usepackage{amssymb}
+
+\newcommand{\todo}[1]{\textsf{\emph{\textbf{\textcolor{red}{#1}}}}}
+\newcommand{\var}[1]{\texttt{#1}}
 
 \title{Visualising Courtship Index from Videos of Drosophila}
 
@@ -21,33 +28,66 @@ Courtship index (CI) in \emph{Drosophila} is defined as the percentage of time s
 
 A trained individual is capable of recording courtship in four flies at a time, or in one fly at up to 4$\times$ real-time video playback. This method of recording courtship index involves two gross forms of information attenuation. The first is the attenuation of phenotypic information - compressing a large number of different behaviours into a single ``courtship'' behaviour (such as singing, chasing, dancing etc). The second is the attenuation of temporal information - compressing the time course of courtship behaviour into a single percentage value. This paper aims to address the second of these issues, using automatic machine vision and machine learning techniques to overcome the inherent limitations of manual analysis that necessitates temporal attenuation.
 
+\todo{Biological questions ANSWERED oh yes}
+
 The use of automated analysis to overcome this attenuation has a set of additional benefits. The most striking of these in practice is the reduction of labour - the methods reported below work faster than real time, removing the need to perform routine viewing of the videos and allowing the biologist to focus on novel phenotypes that arise. Another benefit is consistency - these methods always return the same results when presented with the same data. This allows comparisons across studies without dealing with (or guiltily ignoring) the problem that different individuals can analyse the same video quite differently. The final benefit of these methods is the ability to publish the classifier used to generate the results along with the collected video and feature data.
 
-Our approach has two main components: tracking and classification. The tracking component combines a background model, a sequence of image manipulations and a basic model of fly movement in order to extract position and orientation features from the video. The classification component uses a labelled set of videos along with their extracted features to train a decision tree, which can be used to classify any subsequent videos. The remainder of the paper describes these two components, as well as a visualisation of the output of the decision tree in order to provide a rich summary of the courtship behaviour. A final classifier is used to separate markedly different courtship phenotypes based on the information extracted from the videos.
+Our approach has two main components: tracking and classification. The tracking component combines a background model, a sequence of image manipulations and a basic model of fly movement in order to extract position and orientation features from the video. The classification component uses a labelled set of videos along with their extracted features to train a decision tree, which can be used to classify any subsequent videos. 
+
+\todo{What's novel? Temporal patterns of courtship exposed. Application of mature machine vision and machine learning techniques to the problem of courtship index detection. Extensibility of techniques to any behaviour in any animal that can be described as on or off in a particular frame (active investigation, the one where they go in the middle or not)}
+
+This paper is structured as follows. Sections \ref{sec:tracking} and \ref{sec:classification} describe the tracking and classification components, respectively. The developed dynamic courtship index detection algorithm is summarised in section \ref{sec:algorithm} using an example workflow. Visualisation of the dynamic courtship index provides a rich summary of the courtship behaviour - two options are given in Section \ref{sec:visualisation}. An example use of this information is to separate markedly different courtship phenotypes based on the dynamic information extracted from the videos, illustrated in Section \ref{sec:example}.
 
 \section{Tracking}
+\label{sec:tracking}
 
-The video data consists of (at least one set of) a pair of courting flies. In order to decide whether or not courtship is taking place, we need to extract the position and orientation of each fly in the video. 
+The video data consists of at least one pair of courting flies. In order to decide whether or not courtship is taking place, we need to extract the position and orientation of each fly in the video. The video itself is envisaged to come from a standard experimental setup: a single camera, viewing the courtship chamber(s) from above, with illumination coming from a set of non-specialist lights. The camera will likely be a hand-held camcorder or an IP camera (webcam) operating at around 30 frames per second. 
 
-The video itself is envisaged to come from a standard experimental setup: a single camera, viewing the courtship chamber(s) from above, with illumination coming from a set of non-specialist lights. The camera will likely be a hand-held camcorder or an IP camera (webcam) operating at around 30 frames per second. 
+This experimental setup presents the first problem for the tracking approach - such videos are considered to be of a low quality. The fly takes up as little as a 10$\times$5 rectangle of pixels; the frame rate is low compared to some of the faster movements performed by the fly; lighting, reflections and shadows clutter the scene; video compression artefacts distort the sequence of images. 
 
-This presents the first problem for the tracking approach - such videos are considered to be of a low quality. The fly takes up as little as a 10$\times$5 rectangle of pixels; the frame rate is low compared to some of the faster movements performed by the fly; lighting, reflections and shadows clutter the scene; video compression artefacts distort the sequence of images. 
-
-The second problem for the tracking approach is the movement of the flies. A smoothly moving object in a scene is relatively straight forward to track as its movements are quite predictable. A courting Drosophila, on the other hand, exhibits highly non-smooth, unpredictable movement. At best we can say that the flies mostly move forward. 
+The second problem for the tracking approach is the movement of the flies. A smoothly moving object in a scene is relatively straight forward to track as its movements are quite predictable. A courting Drosophila, on the other hand, exhibits highly non-smooth, unpredictable movement. At best we can say that the flies mostly move forward - anything more descriptive requires a great deal of modelling using contemporary methods (see e.g. \cite{Oh}) which remain largely unproven in practice.
 
 The developed tracking algorithm attempts to deal with these issues in a straightforward and robust manner. We first fit ellipsoids to the flies before trying to determine their orientation. The orientation is determined using a smoothness constraint: it is unlikely that the fly will turn through a large angle in a single frame transition, and the observation that flies are much more likely to move in the direction they are facing.
 
-Our algorithm is summarised in Table \ref{tab:tracking}, and illustrated in Figure \ref{fig:tracking}. 
+Our algorithm is summarised in Table \ref{tab:tracking}, and illustrated in Figure \ref{fig:tracking}.
+
+\subsection{Arena Fitting}
+
+\todo{Hough Transform goodness}
+
+\subsection{Background Subtraction}
+
+\todo{
+\begin{itemize}
+	\item how the background model is generated
+	\item what happens when you subtract it from the scene
+\end{itemize}
+}
+
+\subsection{Ellipse fitting}
+
+\todo{
+\begin{itemize}
+	\item how the candidate ellipses are chosen
+	\item how the ellipses are filtered
+	\item how the final two ellipses are chosen
+\end{itemize}
+}
+
+\subsection{Orientation determination}
+
+\todo{how the orientation of the ellipse is determined}
 
 \begin{table}
 \begin{enumerate}
+	\item fit arena
 	\item create background model
 	\item for each frame:
 	\begin{enumerate}
 		\item remove codec artefacts
 		\item remove background model
 		\item threshold
-		\item mask
+		\item mask using arean fit
 		\item find contours
 		\item fit ellipses
 		\item filter inappropriate ellipses
@@ -56,7 +96,7 @@ Our algorithm is summarised in Table \ref{tab:tracking}, and illustrated in Figu
 	\end{enumerate}
 \end{enumerate}
 \label{tab:tracking}
-\caption{Each step of the tracking algorithm used for extracting the position and orientation from a low-quality video.}
+\caption{Each step of the tracking algorithm used for extracting the position and orientation from a low-quality video. \todo{Make this into a proper algorithm that ideally takes up a lot less space}}
 \end{table}
 
 \begin{figure}
@@ -66,28 +106,112 @@ Our algorithm is summarised in Table \ref{tab:tracking}, and illustrated in Figu
 \end{figure}
 
 \section{Classification}
+\label{sec:classification}
 
-In order to extract standard CI from a period video we need to be able to determine how long the fly spends courting in this period. When looking at all the various aspects of courtship behaviour we are able to highlight two features that are sufficient to characterise the vast majority of them: proximity and of male orientation with respect to the female (`pointing'). 
+In order to extract standard CI from a period of video we need to be able to determine how long the fly spends courting. When looking at all the various aspects of courtship behaviour we are able to highlight two features that are sufficient to characterise the vast majority of them: \var{proximity} and of male orientation with respect to the female (\var{pointing}).
 
 For example, the courtship dance displayed by the male is typically performed within a certain distance, with the male maintaining his orientation toward the female at all times. Chasing, tapping and licking are all performed at very close proximity with male orientation toward the female. Due to the sensing abilities of the male fly, courtship rarely takes place at a large distance, and if the male is close to and facing the female for much longer than a second it is unlikely that anything but courtship is taking place.
 
-However, this relationship between proximity, pointing and courtship is not a straight-forward one, and can change depending on the experimental setup. In addition, the details associated with how close a male fly should be to the female in order to be considered courting, or how much he should be facing her, are not universally agreed on. 
+However, this relationship between \var{proximity}, \var{pointing} and courtship is not a straight-forward one, and can change depending on the experimental setup. In addition, the details associated with how close a male fly should be to the female in order to be considered courting, or how much he should be facing her, are not universally agreed on.
 
-Hence a technique that can learn the non-linear relationship between proximity, pointing and courtship, that can be adapted to a user's idea of what is considered courtship, is required. To deliver this we present a decision tree technique that is able to learn this relationship and hence classify each frame of a video as courting or not courting. 
+A technique is therefore required that can learn the non-linear relationship between \var{proximity}, \var{pointing} and courtship, and that can be adapted to a user's idea of what is considered courtship. To deliver this we use a decision tree technique that is able to learn this relationship and hence classify each frame of a video as courting or not courting.
+
+A decision tree is a simple classifier that, given a set of input features (in our case \var{proximity} and \var{pointing}), attempts to classify them by answering a series of questions designed to separate the various combinations of features into different groups. The decision tree is so-called as these questions can lead to either one of two questions, or a classification, leading to a tree-shaped structure. An example decision tree for classifying courtship is shown in Figure \ref{fig:decisiontree}.
+
+\begin{figure}
+	\caption{An example of a decision tree, trained using a set of annotated examples, ready to classify future videos. On the left is a representation of the network of questions used to classify each frame. On the right is the decision boundary in the \var{proximity}-\var{pointing} space that the decision tree represents.}
+	\label{fig:decisiontree}
+\end{figure}
+
+\subsection{Annotations}
+
+In order to construct a decision tree we require a set of annotated example video frames. Ideally this example set contains most of the types of  behaviours expected to be observed in the rest of the experiment. Exactly how much annotated footage is required is not specified exactly. In the example below, we use 10 minutes of annotated footage to classify several hour's worth of experiment.
+
+\subsection{Training}
+
+Training the decision tree to recognise the presence of courtship proceeds using the J48 algorithm \cite{weka}. This algorithm bisects sections of the feature space parallel to each axis in turn, using the line that best separates the points considered to be courtship from those that aren't. The feature space here is the space of all possible proximities (in pixels) and orientations (in radians). The details of the J48 algorithm can be found elsewhere \cite{Frank}; what is important is that the resulting classifier can have a rather complex decision boundary as shown in Figure \ref{fig:decisiontree}, whilst still being constructed entirely from inequality questions (such as ``is male closer than 10px to the female'') that can be interrogated by the user.
+
+\subsection{Classification}
+
+Classification of new frames of the video proceeds by extracting the \var{pointing} and \var{proximity} features from the video using Algorithm \ref{tab:tracking} and then passing these features through the decision tree to arrive at a courting-or-not classification. Once the tree has been constructed, the actual classification is a very simple process that introduces very little computational overhead, allowing the classification to be performed in real time if being applied to a video stream, or much faster than real time if using data that has already been processed using Algorithm \ref{tab:tracking}.
+
+\subsection{Temporal Smoothing}
+
+Due to the ``hard'' nature of the decision boundary, male flies exhibiting behaviour near the boundary can possibly switch rapidly in-and-out of the ``courting'' classification. Also, there are cases where the female fly escapes for a small period of time before the male fly catches up, generating a brief erroneous classification of ``not courting''. Both these situations are undesirable, and reflect the difficulty of classifying dynamic behaviours with a static classifier. They can be overcome using single parameter set by the user which controls the temporal smoothness of the resulting classification. Essentially this parameter quantifies the smallest possible period between courtship bouts. This period is by no means agreed upon and hence is left up to the user. A so-called ``lumper'' will set this parameter to be a few seconds, leading to long uninterrupted bouts of courtship. A ``splitter'' will leave this parameter small allowing short bouts of courtship.
+
+\section{Algorithm}
+\label{sec:algorithm}
+
+\subsection{Workflow}
+
+An example workflow using an IP camera is given in Algorithm \ref{tab}.
+
+\begin{table}
+\begin{enumerate}
+	\item Capture 10 minutes from a single experiment and annotate the presence-or-not of courtship in each frame.
+	\item Run Algorithm \ref{tab:tracking} on the 10 minute video and store the extracted features.
+	\item Train a decision tree using the extracted features and annotations.
+	\item Set up a video stream using the IP camera (using, for example, VLC \ref{VLC}). 
+	\item For each frame captured from the stream:
+	\begin{enumerate}
+		\item Extract the \var{pointing} and \var{proximity} features using step 3 from Algorithm \ref{tab:tracking}.
+		\item Classify features using the decision tree trained in step 2.
+		\item Store presence-or-not of courtship.
+	\end{enumerate}
+	\item Temporally smooth courtship classification using user-supplied parameter.
+\end{enumerate}
+		
+\label{tab:tracking}
+\caption{An example workflow combining the tracking and classification algorithms. Note that using this approach there is no need to store the video itself, though the video can be stored for future analysis.\todo{Make this into a proper algorithm that ideally takes up a lot less space}}
+\end{table}
+
+\subsection{Performance}
+
+\todo{Performance of the algorithm}
 
 \section{Visualisation}
+\label{sec:visualisation}
 
-Different visualisation options
+This approach results in a binary variable for each frame indicating the presence of courtship in that frame. We present two related forms of visualisation that summarises the information about courtship we have extracted from the video. To make the visualisations clear, let $c_t \in \{1,0\}$ denote the presence of courtship in frame $t$, such that $c_t = 1$ if courtship has been detected and $c_t = 0$ otherwise. Let time range from $t=1$ to the final time $T$. Here the initial time is set by the user, and will typically be the frame when the male fly is introduced to the female.
 
-\section{Classifying Courtship Dynamics}
+Initially, note that the standard courtship index measure is given by
+\begin{equation}
+	\mathrm{CI} = \frac{1}{T}\sum_{t=1}^Tc_t
+\end{equation}
+i.e. the percentage of time spent courting over the duration of the video. Hence this approach can be used to return the standard measure automatically, for comparison against earlier studies. 
 
-Parmeterisation of the courtship index curves
+The first visualisation directly shows the on-off nature of the behaviour. We plot time against the Smoothed Courtship Index at time $t$
+\begin{equation}
+	\mathrm{SCI}_t = \frac{1}{w}\sum_{\tau=t-0.5w}^{t+0.5w}c_\tau, ~ \mathrm{for} ~ 0.5w<t<T-0.5w
+\end{equation}
+where $w$ is the width of a moving-average window that passes along the time course \todo{sentence}
 
-\section{Performance}
+The second visualisation of the temporal information is to plot time against the Cumulative Courtship Index at time $t$
+\begin{equation}
+	\mathrm{CCI}_t = \frac{1}{t}\sum_{\tau=1}^t c_\tau
+\end{equation}
+This will result in a curve starting at the origin at $t=0$ and ending at the standard CI at $t=T$. A fly which courts during every single frame of the video will describe a straight diagonal line from the origin to the point $(T,1)$ (i.e. the top-right hand corner of the graph). A fly which doesn't court at all will describe a flat line along the $x$-axis. 
 
-Performance of the algorithm
+In reality, as shown in Figure \ref{fig:CCI}, a courting fly exhibits more complex behaviour. For example, the initial warm-up period \todo{(this has a proper name)}, is shown as a flat line for a small period at the start of the line, before exhibiting a range of behaviours. As shown in the figure, these include courting for a period of time before giving up for the remainder of the experiment or a courting-pausing-courting pattern. 
+
+Note that these behaviours are very easy to spot using the visualisation, and that they would all report a similar standard CI. All of this along with a much smaller amount of labour than would normally be required for manually scoring standard CI.
+
+\begin{figure}
+	\caption{Cumulative courtship index of several male flies courting un-receptive females.}
+	\label{fig:CCI}
+\end{figure}
+
+ 
+
+\section{Example: Classifying Courtship Dynamics}
+\ref{sec:example}
+
+Parameterisation of the courtship index curves
+
 
 \section{Conclusion}
+\ref{sec:conclusion}
+
 Conclusion
 
 \end{document}
