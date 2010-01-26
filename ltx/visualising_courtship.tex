@@ -1,8 +1,9 @@
-\documentclass{article}
+\documentclass[twocolumn]{article}
 \usepackage[pdftex]{graphicx}
 \usepackage{color}
 \usepackage[cmex10]{amsmath} %the AMS stuff, note option
 \usepackage{amssymb}
+\usepackage[linesnumbered]{algorithm2e}
 
 \newcommand{\todo}[1]{\textsf{\emph{\textbf{\textcolor{red}{#1}}}}}
 \newcommand{\var}[1]{\texttt{#1}}
@@ -180,13 +181,18 @@ Initially, note that the standard courtship index measure is given by
 \end{equation}
 i.e. the percentage of time spent courting over the duration of the video. Hence this approach can be used to return the standard measure automatically, for comparison against earlier studies. 
 
-The first visualisation directly shows the on-off nature of the behaviour. We plot time against the Smoothed Courtship Index at time $t$
+The first visualisation directly shows the on-off nature of the behaviour. Here time is plotted against the Smoothed Courtship Index at time $t$, defined as
 \begin{equation}
 	\mathrm{SCI}_t = \frac{1}{w}\sum_{\tau=t-0.5w}^{t+0.5w}c_\tau, ~ \mathrm{for} ~ 0.5w<t<T-0.5w
 \end{equation}
-where $w$ is the width of a moving-average window that passes along the time course \todo{sentence}
+where $w$ is the width of a moving-average window that passes along the series of courtship indicator variables to generate a smooth curve that gives an indication of the periods of courtship across time. While this gives a quick indication of the pattern of courtship during the video, the averaging causes an information loss and the comparison of many traces is not particularly clear. 
 
-The second visualisation of the temporal information is to plot time against the Cumulative Courtship Index at time $t$
+\begin{figure}
+	\caption{Smoothed courtship index of several male flies courting un-receptive females.}
+	\label{fig:SCI}
+\end{figure}
+
+The second visualisation attempts to show all the information extracted from the video. Here we plot time against the Cumulative Courtship Index at time $t$, defined as
 \begin{equation}
 	\mathrm{CCI}_t = \frac{1}{t}\sum_{\tau=1}^t c_\tau
 \end{equation}
@@ -200,8 +206,6 @@ Note that these behaviours are very easy to spot using the visualisation, and th
 	\caption{Cumulative courtship index of several male flies courting un-receptive females.}
 	\label{fig:CCI}
 \end{figure}
-
- 
 
 \section{Example: Classifying Courtship Dynamics}
 \ref{sec:example}
