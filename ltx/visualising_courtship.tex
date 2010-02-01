@@ -20,7 +20,9 @@
 	\maketitle
 
 	\begin{abstract}
-	We present approach to the automated analysis and visualisation of courtship index (CI) in \emph{Drosophila} - usually defined as the percentage of time the male fruit fly spends displaying courtship behaviour over a fixed period. Using machine vision techniques we extract position and orientation features from video of courting flies. These features are then used in a classifier in order to determine the presence of courtship behaviour in each frame. Using this information we generate a set of visualisations which emphasises the time course of the behaviour. Hence, we arrive at a much richer interpretation of courtship index, one that highlights the dynamic aspects of \emph{Drosophila} courtship behaviour, exposing phenotypic information that the standard, manual assay would typically miss.
+	{\sf
+	We present an approach to the fully automated analysis and visualisation of courtship index (CI) in \emph{Drosophila} - usually defined as the percentage of time the male fruit fly spends displaying courtship behaviour over a fixed period. Using machine vision techniques we extract position and orientation features from video of courting flies. These features are then used in a classifier in order to determine the presence of courtship behaviour in each frame. Using this information we generate a set of visualisations which emphasises the time course of the behaviour. Hence, we arrive at a much richer interpretation of courtship index, one that highlights the dynamic aspects of \emph{Drosophila} courtship behaviour, exposing phenotypic information that the standard, manual assay would typically miss.
+	}
 	\end{abstract}
 
 \section{Introduction}
@@ -29,13 +31,15 @@ Courtship index (CI) in \emph{Drosophila} is defined as the percentage of time s
 
 A trained individual is capable of recording courtship in four flies at a time, or in one fly at up to 4$\times$ real-time video playback. This method of recording courtship index involves two gross forms of information attenuation. The first is the attenuation of phenotypic information - compressing a large number of different behaviours into a single ``courtship'' behaviour (such as singing, chasing, dancing etc). The second is the attenuation of temporal information - compressing the time course of courtship behaviour into a single percentage value. This paper aims to address the second of these issues, using automatic machine vision and machine learning techniques to overcome the inherent limitations of manual analysis that necessitates temporal attenuation.
 
-\todo{Biological questions ANSWERED oh yes}
+%\todo{Biological questions ANSWERED oh yes}
 
 The use of automated analysis to overcome this attenuation has a set of additional benefits. The most striking of these in practice is the reduction of labour - the methods reported below work faster than real time, removing the need to perform routine viewing of the videos and allowing the biologist to focus on novel phenotypes that arise. Another benefit is consistency - these methods always return the same results when presented with the same data. This allows comparisons across studies without dealing with (or guiltily ignoring) the problem that different individuals can analyse the same video quite differently. The final benefit of these methods is the ability to publish the classifier used to generate the results along with the collected video and feature data.
 
 Our approach has two main components: tracking and classification. The tracking component combines a background model, a sequence of image manipulations and a basic model of fly movement in order to extract position and orientation features from the video. The classification component uses a labelled set of videos along with their extracted features to train a decision tree, which can be used to classify any subsequent videos. 
 
-\todo{What's novel? Temporal patterns of courtship exposed. Application of mature machine vision and machine learning techniques to the problem of courtship index detection. Extensibility of techniques to any behaviour in any animal that can be described as on or off in a particular frame (active investigation, the one where they go in the middle or not)}
+The novel aspects of this work are in the direct application of mature machine vision and machine learning techniques to the problem of fully automating courtship index.
+
+%\todo{What's novel? Temporal patterns of courtship exposed. Application of mature machine vision and machine learning techniques to the problem of courtship index detection. Extensibility of techniques to any behaviour in any animal that can be described as on or off in a particular frame (active investigation, the one where they go in the middle or not)}
 
 This paper is structured as follows. Sections \ref{sec:tracking} and \ref{sec:classification} describe the tracking and classification components, respectively. The developed dynamic courtship index detection algorithm is summarised in section \ref{sec:algorithm} using an example workflow. Visualisation of the dynamic courtship index provides a rich summary of the courtship behaviour - two options are given in Section \ref{sec:visualisation}. An example use of this information is to separate markedly different courtship phenotypes based on the dynamic information extracted from the videos, illustrated in Section \ref{sec:example}.
 
@@ -216,6 +220,6 @@ Parameterisation of the courtship index curves
 \section{Conclusion}
 \ref{sec:conclusion}
 
-Conclusion
+An interesting, and crucial, observation that has arisen from this study is that tracking and classification are not independent concerns. The one-way flow of information only works if the tracking is guaranteed to not miss or lose the labelling of the flies as male and female. If these labels are in anyway switched, then serious inaccuracies can occur. A more useful and robust solution is one that that would allow the classification to act to guide, or reinitialise, the tracking. This realisation is similar to the way in which human observers retain their effectual labelling of the flies - if they lose which one is which then they simply wait to observe when one fly starts to obviously follow and orientate to the other - acting as a visual cue to relabelling. Having a computational framework that could also combine the current context of the classified behaviour to infer the dynamics of the fly at the next timestep for tracking is an ongoing question for research.
 
 \end{document}
